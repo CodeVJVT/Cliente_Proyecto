@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import "./SolveExercise.css";
+import API_BASE_URL from "../utils/api";
 
 const SolveExercise = () => {
   const { exerciseCode } = useParams();
@@ -13,7 +14,7 @@ const SolveExercise = () => {
     const fetchExercise = async () => {
       try {
         const response = await fetch(
-          `http://localhost:5000/api/exercises/details/${exerciseCode}`,
+          `${API_BASE_URL}/api/exercises/details/${exerciseCode}`,
           {
             headers: {
               "auth-token": localStorage.getItem("auth-token"),
@@ -39,7 +40,7 @@ const SolveExercise = () => {
   const handleSubmit = async () => {
     try {
       const response = await fetch(
-        "http://localhost:5000/api/validate-answer",
+        `${API_BASE_URL}/api/validate-answer`,
         {
           method: "POST",
           headers: {

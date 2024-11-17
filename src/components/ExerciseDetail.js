@@ -1,49 +1,75 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import CodeMirror from "@uiw/react-codemirror"; // Importa el componente predeterminado
+import { useParams, useNavigate } from "react-router-dom";
+import CodeMirror from "@uiw/react-codemirror";
 import { javascript } from "@codemirror/lang-javascript";
 import "./ExerciseDetail.css";
+import API_BASE_URL from '../utils/api';
 
 const ExerciseDetail = () => {
   const { exerciseId } = useParams();
+  const navigate = useNavigate();
   const [exercise, setExercise] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [userCode, setUserCode] = useState("");
   const [feedback, setFeedback] = useState("");
+  const [isCorrect, setIsCorrect] = useState(false);
 
   useEffect(() => {
-    const fetchExerciseDetail = async () => {
-      try {
-        const response = await fetch(
-          `http://localhost:5000/api/problems/details/${exerciseId}`,
-          {
-            headers: {
-              "auth-token": localStorage.getItem("auth-token"),
-            },
-          }
-        );
-
-        if (!response.ok) {
-          throw new Error("Error al obtener el detalle del ejercicio.");
-        }
-
-        const data = await response.json();
-        setExercise(data.exercise);
-      } catch (error) {
-        setError(error.message);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchExerciseDetail();
   }, [exerciseId]);
 
-  const handleSubmit = async () => {
+  const fetchExerciseDetail = async () => {
+    setLoading(true);
+    setUserCode(""); // Limpiar editor
+    setFeedback(""); // Limpiar feedback
+    setIsCorrect(false); // Resetear estado
+
     try {
       const response = await fetch(
-        `http://localhost:5000/api/validate/validate-answer`,
+        `${API_BASE_URL}/api/problems/details/${exerciseId}`,
+        {
+          headers: { "auth-token": localStorage.getItem("auth-token") },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Error al obtener el detalle del ejercicio.");
+      }
+
+      const data = await response.json();
+      setExercise(data.exercise);
+
+      const progressResponse = await fetch(
+        `${API_BASE_URL}/api/user-progress/progress`,
+        {
+          headers: { "auth-token": localStorage.getItem("auth-token") },
+        }
+      );
+
+      const progressData = await progressResponse.json();
+      if (progressData.success) {
+        const solvedProblem = progressData.progress.solvedProblems.find(
+          (p) => p.problemCode === exerciseId
+        );
+
+        if (solvedProblem && solvedProblem.status === "correcto") {
+          setIsCorrect(true);
+          setUserCode(solvedProblem.userCode); // Mostrar el código
+        }
+      }
+    } catch (error) {
+      setError(error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSubmit = async () => {
+    const cleanedCode = userCode.replace(/\s+/g, " ").trim(); // Normaliza el código del usuario
+    try {
+      const response = await fetch(
+        `${API_BASE_URL}/api/validate/validate-answer`,
         {
           method: "POST",
           headers: {
@@ -51,8 +77,8 @@ const ExerciseDetail = () => {
             "auth-token": localStorage.getItem("auth-token"),
           },
           body: JSON.stringify({
-            code: exercise.code, // Debe coincidir con el campo en el backend
-            userCode, // Código del usuario
+            code: exercise.code,
+            userCode: cleanedCode,
           }),
         }
       );
@@ -63,8 +89,38 @@ const ExerciseDetail = () => {
 
       const data = await response.json();
       setFeedback(data.validation.feedback);
+      setIsCorrect(data.validation.isCorrect);
     } catch (error) {
       setFeedback("Hubo un error al validar tu código. Inténtalo nuevamente.");
+    }
+  };
+
+  const handleNextExercise = async () => {
+    try {
+      const response = await fetch(
+        `${API_BASE_URL}/api/problems/generate-problem`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "auth-token": localStorage.getItem("auth-token"),
+          },
+          body: JSON.stringify({
+            topic: exercise.topic,
+            level: exercise.level,
+          }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Error al generar el siguiente ejercicio.");
+      }
+
+      const data = await response.json();
+      navigate(`/exercise/${data.problem.code}`);
+    } catch (error) {
+      console.error("Error al generar el siguiente ejercicio:", error.message);
+      setFeedback("Hubo un problema al generar el siguiente ejercicio.");
     }
   };
 
@@ -96,19 +152,23 @@ const ExerciseDetail = () => {
               height="200px"
               extensions={[javascript()]}
               onChange={(value) => setUserCode(value)}
+              editable={!isCorrect} // Bloquear si está resuelto
             />
-            <button onClick={handleSubmit} className="submit-button">
-              Enviar Solución
-            </button>
+            {!isCorrect && (
+              <button onClick={handleSubmit} className="submit-button">
+                Enviar Solución
+              </button>
+            )}
           </div>
           {feedback && (
-            <div
-              className={`feedback-box ${
-                feedback.isCorrect ? "success" : "error"
-              }`}
-            >
+            <div className={`feedback-box ${isCorrect ? "success" : "error"}`}>
               <p>{feedback}</p>
             </div>
+          )}
+          {isCorrect && (
+            <button onClick={handleNextExercise} className="next-button">
+              Siguiente Ejercicio
+            </button>
           )}
         </>
       )}
