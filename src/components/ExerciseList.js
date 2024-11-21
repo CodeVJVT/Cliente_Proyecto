@@ -6,12 +6,14 @@ import API_BASE_URL from "../utils/api";
 const ExerciseList = () => {
   const { topicId } = useParams();
   const [exercises, setExercises] = useState([]);
+  const [listings, setListings] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [loadingListings, setLoadingListings] = useState(false);
   const navigate = useNavigate();
 
   useEffect(() => {
-    const fetchExercises = async () => {
+    const fetchData = async () => {
       try {
         const response = await fetch(
           `${API_BASE_URL}/api/problems/topic/${topicId}`,
@@ -23,11 +25,12 @@ const ExerciseList = () => {
         );
 
         if (!response.ok) {
-          throw new Error("Error al obtener los ejercicios.");
+          throw new Error("Error al obtener los datos.");
         }
 
         const data = await response.json();
-        setExercises(data.exercises);
+        setExercises(data.exercises || []);
+        setListings(data.listings || null);
       } catch (error) {
         setError(error.message);
       } finally {
@@ -35,10 +38,10 @@ const ExerciseList = () => {
       }
     };
 
-    fetchExercises();
+    fetchData();
   }, [topicId]);
 
-  const handleCreateExercise = async () => {
+  const handleCreateExercise = async (exerciseText, level) => {
     try {
       const response = await fetch(
         `${API_BASE_URL}/api/problems/generate-problem`,
@@ -50,7 +53,8 @@ const ExerciseList = () => {
           },
           body: JSON.stringify({
             topic: topicId,
-            level: "facil", // Puedes ajustar el nivel según lo necesites
+            level,
+            exerciseText,
           }),
         }
       );
@@ -63,42 +67,117 @@ const ExerciseList = () => {
       }
 
       const data = await response.json();
-      navigate(`/exercise/${data.problem.code}`); // Navega al ejercicio generado
+      navigate(`/exercise/${data.problem.code}`);
     } catch (error) {
-      setError("error.message");
+      setError(error.message);
+    }
+  };
+
+  const fetchListings = async () => {
+    setLoadingListings(true);
+    setError(null);
+
+    try {
+      const response = await fetch(
+        `${API_BASE_URL}/api/problems/generate-listing`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "auth-token": localStorage.getItem("auth-token"),
+          },
+          body: JSON.stringify({ topic: topicId }),
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Error al generar el listado de ejercicios.");
+      }
+
+      const data = await response.json();
+      setListings(data.listings);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoadingListings(false);
+    }
+  };
+
+  const renderLevel = (level) => {
+    switch (level?.toLowerCase()) {
+      case "facil":
+      case "basico":
+        return "Básico";
+      case "medio":
+      case "intermedio":
+        return "Intermedio";
+      case "avanzado":
+        return "Avanzado";
+      default:
+        console.warn(`Nivel desconocido: ${level}`); // Aviso para depuración
+        return "Nivel Desconocido";
     }
   };
 
   return (
     <div className="exercise-list-container">
       <h2>Ejercicios de {topicId}</h2>
-      {loading && <p>Cargando ejercicios...</p>}
+      {loading && <p className="loading">Cargando datos...</p>}
       {error && <p className="error">{error}</p>}
       {!loading && !error && (
         <>
-          {exercises.length > 0 ? (
-            <ul>
+          {exercises.length > 0 && (
+            <div className="exercise-list">
               {exercises.map((exercise) => (
-                <li
+                <div
                   key={exercise.code}
-                  className="exercise-item"
+                  className="exercise-card"
                   onClick={() => navigate(`/exercise/${exercise.code}`)}
                 >
-                  <h3>{exercise.title}</h3>
-                  <p>{exercise.description}</p>
-                </li>
+                  <h3 className="exercise-title">{exercise.title}</h3>
+                  <p className="exercise-description">{exercise.description}</p>
+                  <div className={`exercise-level ${exercise.level}`}>
+                    Nivel: {renderLevel(exercise.level)}
+                  </div>
+                </div>
               ))}
-            </ul>
-          ) : (
-            <div>
-              <p>No hay ejercicios disponibles para este tema.</p>
-              <button onClick={handleCreateExercise} className="create-button">
-                Crear Nuevo Ejercicio
-              </button>
+            </div>
+          )}
+
+          {listings && (
+            <div className="listings-container">
+              {["basico", "intermedio", "avanzado"].map((level) => (
+                <div key={level} className="listing-category">
+                  <h3>{level.charAt(0).toUpperCase() + level.slice(1)}</h3>
+                  {listings[level]?.map((exerciseText, index) => (
+                    <div
+                      key={index}
+                      onClick={() => handleCreateExercise(exerciseText, level)}
+                      className="listing-item"
+                      aria-label={`Ejercicio ${level}`}
+                    >
+                      {exerciseText}
+                    </div>
+                  ))}
+                </div>
+              ))}
             </div>
           )}
         </>
       )}
+
+      <div className="button-group">
+        <button onClick={() => navigate("/problems")} className="menu-button">
+          Volver al Menú
+        </button>
+        <button
+          onClick={fetchListings}
+          className="regenerate-button"
+          disabled={loadingListings}
+        >
+          {loadingListings ? "Cargando..." : "Regenerar Listado"}
+        </button>
+      </div>
     </div>
   );
 };

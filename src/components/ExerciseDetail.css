@@ -1,123 +1,184 @@
+/* Contenedor Principal */
 .exercise-detail-container {
-    padding: 20px;
-    max-width: 800px;
-    margin: 0 auto;
-    background-color: #ffffff;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  }
-  
-  .exercise-header {
-    text-align: center;
-    margin-bottom: 20px;
-  }
-  
-  .exercise-header h2 {
-    font-size: 2rem;
-    color: #333;
-  }
-  
-  .exercise-level {
-    font-size: 1rem;
-    color: #007bff;
-    margin-top: 5px;
-  }
-  
-  .exercise-description {
-    font-size: 1.2rem;
-    color: #555;
-    margin-bottom: 20px;
-  }
-  
-  .exercise-example {
-    background-color: #f8f9fa;
+  padding: 20px;
+  max-width: 900px;
+  margin: auto;
+  background: #ffffff; /* Fondo blanco */
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+  color: #333333; /* Texto oscuro */
+  font-family: "Roboto", sans-serif; /* Fuente uniforme */
+}
+
+/* Encabezado */
+.exercise-header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.exercise-header h2 {
+  font-size: 32px;
+  font-weight: bold;
+  color: #333333;
+  margin-bottom: 10px;
+}
+
+.exercise-header .exercise-level,
+.exercise-header .exercise-language {
+  display: inline-block;
+  margin: 5px;
+  padding: 6px 12px;
+  font-size: 14px;
+  font-weight: bold;
+  border-radius: 20px;
+  color: #fff; /* Texto en etiquetas */
+  text-transform: uppercase;
+}
+
+.exercise-header .exercise-level.facil {
+  background-color: #5cb85c; /* Verde */
+}
+
+.exercise-header .exercise-level.medio {
+  background-color: #f0ad4e; /* Amarillo */
+}
+
+.exercise-header .exercise-level.dificil {
+  background-color: #d9534f; /* Rojo */
+}
+
+.exercise-header .exercise-language {
+  background-color: #0275d8; /* Azul */
+}
+
+.exercise-level {
+  background-color: #0275d8; /* Azul */
+}
+
+/* Descripción */
+.exercise-description {
+  margin-bottom: 20px;
+  font-size: 16px;
+  line-height: 1.8;
+  text-align: justify;
+  color: #444444; /* Texto más oscuro */
+}
+
+/* Ejemplos */
+.example-section {
+  background: #f8f9fa; /* Fondo gris claro */
+  padding: 15px;
+  border: 1px solid #dce5f5;
+  border-radius: 8px;
+  margin-bottom: 15px;
+}
+
+.example-section h3 {
+  font-size: 18px;
+  font-weight: bold;
+  color: #0275d8;
+  margin-bottom: 10px;
+}
+
+pre {
+  background: #f4f4f7; /* Fondo para código */
+  padding: 12px;
+  border-radius: 6px;
+  overflow-x: auto;
+  font-family: "Fira Code", monospace; /* Fuente específica para código */
+  font-size: 14px;
+  color: #333333; /* Texto oscuro */
+}
+
+/* Editor de Código */
+.code-editor {
+  margin-top: 20px;
+}
+
+.code-editor h3 {
+  font-size: 20px;
+  font-weight: bold;
+  color: #444444;
+  margin-bottom: 10px;
+}
+
+.CodeMirror {
+  border: 1px solid #d0d0d0;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Botones */
+.submit-button {
+  display: block;
+  margin: 20px auto;
+  padding: 12px 30px;
+  font-size: 16px;
+  color: #ffffff;
+  background-color: #0275d8;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.2s;
+  font-weight: bold;
+}
+
+.submit-button:hover {
+  background-color: #025aa5;
+  transform: scale(1.05);
+}
+
+.back-button {
+  padding: 12px 30px;
+  font-size: 16px;
+  color: #ffffff;
+  background-color: #6c757d;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s, transform 0.2s;
+  font-weight: bold;
+}
+
+.back-button:hover {
+  background-color: #5a6268;
+  transform: scale(1.05);
+}
+
+/* Feedback */
+.feedback-box {
+  margin-top: 20px;
+  padding: 15px;
+  border-radius: 8px;
+  font-size: 16px;
+  text-align: center;
+  font-weight: bold;
+}
+
+.feedback-box.success {
+  background-color: #dff0d8; /* Verde claro */
+  color: #3c763d; /* Verde oscuro */
+}
+
+.feedback-box.error {
+  background-color: #f2dede; /* Rojo claro */
+  color: #a94442; /* Rojo oscuro */
+}
+
+/* Responsivo */
+@media (max-width: 768px) {
+  .exercise-detail-container {
     padding: 15px;
-    border-radius: 5px;
-    margin-bottom: 10px;
-    border-left: 4px solid #007bff;
-  }
-  
-  .exercise-example h3 {
-    margin: 0 0 10px 0;
-    font-size: 1.2rem;
-    color: #007bff;
-  }
-  
-  pre {
-    background-color: #f1f1f1;
-    padding: 10px;
-    border-radius: 5px;
-    font-size: 1rem;
-    color: #333;
-    overflow-x: auto;
-  }
-  
-  .loading {
-    font-size: 1.5rem;
-    color: #007bff;
-    text-align: center;
-  }
-  
-  .error {
-    font-size: 1.2rem;
-    color: red;
-    text-align: center;
-  }
-  
-  .code-editor {
-    margin-top: 20px;
-    background-color: #f8f9fa;
-    padding: 15px;
-    border-radius: 5px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  }
-  
-  .submit-button {
-    margin-top: 10px;
-    background-color: #007bff;
-    color: white;
-    padding: 10px 15px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background-color 0.2s;
-  }
-  
-  .submit-button:hover {
-    background-color: #0056b3;
-  }
-  
-  .feedback {
-    margin-top: 15px;
-    font-size: 1.2rem;
-    color: green;
-    text-align: center;
   }
 
-  .feedback-box {
-    margin-top: 20px;
-    padding: 15px;
-    border-radius: 5px;
-    font-size: 1.2rem;
-    text-align: center;
-  }
-  
-  .feedback-box.success {
-    background-color: #d4edda;
-    color: #155724;
-    border: 1px solid #c3e6cb;
-  }
-  
-  .feedback-box.error {
-    background-color: #f8d7da;
-    color: #721c24;
-    border: 1px solid #f5c6cb;
+  .submit-button,
+  .back-button {
+    font-size: 14px;
+    padding: 10px 20px;
   }
 
-  .correct {
-    color: green;
+  h3 {
+    font-size: 18px;
   }
-  
-  .incorrect {
-    color: red;
-  }
+}
