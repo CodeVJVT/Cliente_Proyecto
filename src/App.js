@@ -20,13 +20,7 @@ function App() {
   return (
     <Router>
       <Routes>
-        <Route
-          path="/"
-          element={
-            // Si el usuario está autenticado, redirige a /problems, de lo contrario a /register
-            <Navigate to={isAuthenticated ? "/problems" : "/login"} />
-          }
-        />
+        <Route path="/" element={<Navigate to="/login" />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
 

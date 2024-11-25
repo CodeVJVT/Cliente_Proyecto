@@ -1,4 +1,5 @@
 import React, { useState, useContext } from "react";
+import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import API_BASE_URL from "../utils/api";
 import { AuthContext } from "../context/AuthContext"; // Importamos el contexto
@@ -65,7 +66,7 @@ const Login = () => {
         {isLoading && <p>Cargando...</p>}
         {errorMessage && <p className="error">{errorMessage}</p>}
         <p>
-          ¿No tienes cuenta? <a href="/register">Regístrate aquí</a>
+          ¿No tienes cuenta? <Link to="/register">Regístrate aquí</Link>
         </p>
       </form>
     </div>
