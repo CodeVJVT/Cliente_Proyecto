@@ -41,8 +41,17 @@ const ExerciseList = () => {
     fetchData();
   }, [topicId]);
 
-  const handleCreateExercise = async (exerciseText, level) => {
+  const handleCreateExercise = async (exerciseText, level, index, category) => {
     try {
+      await fetch(`${API_BASE_URL}/api/problems/mark-selected`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "auth-token": localStorage.getItem("auth-token"),
+        },
+        body: JSON.stringify({ topic: topicId, category, index }),
+      });
+  
       const response = await fetch(
         `${API_BASE_URL}/api/problems/generate-problem`,
         {
@@ -58,20 +67,21 @@ const ExerciseList = () => {
           }),
         }
       );
-
+  
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(
           errorData.error || "Error al generar un nuevo ejercicio."
         );
       }
-
+  
       const data = await response.json();
       navigate(`/exercise/${data.problem.code}`);
     } catch (error) {
       setError(error.message);
     }
   };
+  
 
   const fetchListings = async () => {
     setLoadingListings(true);
@@ -111,10 +121,11 @@ const ExerciseList = () => {
       case "medio":
       case "intermedio":
         return "Intermedio";
+      case "dificil":
       case "avanzado":
         return "Avanzado";
       default:
-        console.warn(`Nivel desconocido: ${level}`); // Aviso para depuración
+        console.warn(`Nivel desconocido: ${level}`);
         return "Nivel Desconocido";
     }
   };
@@ -152,7 +163,9 @@ const ExerciseList = () => {
                   {listings[level]?.map((exerciseText, index) => (
                     <div
                       key={index}
-                      onClick={() => handleCreateExercise(exerciseText, level)}
+                      onClick={() =>
+                        handleCreateExercise(exerciseText, level, index, level)
+                      }
                       className="listing-item"
                       aria-label={`Ejercicio ${level}`}
                     >

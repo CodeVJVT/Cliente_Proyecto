@@ -175,3 +175,14 @@ h2 {
   margin: 20px 0;
   text-align: center;
 }
+
+.disabled-item {
+  color: #999;
+  cursor: not-allowed;
+  text-decoration: line-through;
+}
+
+.disabled-item:hover {
+  background-color: unset;
+  text-decoration: line-through;
+}

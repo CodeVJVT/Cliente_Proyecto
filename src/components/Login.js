@@ -1,15 +1,19 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import API_BASE_URL from "../utils/api";
+import { AuthContext } from "../context/AuthContext"; // Importamos el contexto
 
-const Login = ({ setIsAuthenticated }) => {
+const Login = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const { login } = useContext(AuthContext); // Usamos el método login del contexto
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    setIsLoading(true); // Inicia el proceso de carga
 
     try {
       const response = await fetch(`${API_BASE_URL}/api/auth/Login`, {
@@ -21,17 +25,19 @@ const Login = ({ setIsAuthenticated }) => {
       });
 
       const data = await response.json();
-      if (response.status === 400) {
-        setErrorMessage(data.message);
+
+      if (!response.ok) {
+        setErrorMessage(data.message || "Hubo un problema al iniciar sesión.");
       } else {
-        localStorage.setItem("auth-token", data.token);
-        setIsAuthenticated(true); // Actualizar estado de autenticación
-        navigate("/problems"); // Redirigir al dashboard
+        login(data.token); // Usamos el método login del contexto
+        navigate("/problems"); // Redirige al dashboard
       }
     } catch (error) {
       setErrorMessage(
         "Hubo un problema al intentar iniciar sesión. Por favor, intenta nuevamente."
       );
+    } finally {
+      setIsLoading(false); // Detiene el proceso de carga
     }
   };
 
@@ -44,14 +50,19 @@ const Login = ({ setIsAuthenticated }) => {
           placeholder="Usuario"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
+          disabled={isLoading}
         />
         <input
           type="password"
           placeholder="Contraseña"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
+          disabled={isLoading}
         />
-        <button type="submit">Login</button>
+        <button type="submit" disabled={isLoading}>
+          Login
+        </button>
+        {isLoading && <p>Cargando...</p>}
         {errorMessage && <p className="error">{errorMessage}</p>}
         <p>
           ¿No tienes cuenta? <a href="/register">Regístrate aquí</a>
