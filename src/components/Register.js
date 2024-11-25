@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import API_BASE_URL from "../utils/api";
+import { Link } from "react-router-dom";
 
 const Register = () => {
   const [username, setUsername] = useState("");
@@ -56,7 +57,7 @@ const Register = () => {
         {errorMessage && <p className="error">{errorMessage}</p>}
         {successMessage && <p className="success">{successMessage}</p>}
         <p>
-          ¿Ya tienes una cuenta? <a href="/login">Inicia sesión aquí</a>
+          ¿Ya tienes una cuenta? <Link to="/register">Inicia sesión aquí</Link>
         </p>
       </form>
     </div>
