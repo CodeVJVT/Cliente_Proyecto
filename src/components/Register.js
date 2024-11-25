@@ -57,7 +57,7 @@ const Register = () => {
         {errorMessage && <p className="error">{errorMessage}</p>}
         {successMessage && <p className="success">{successMessage}</p>}
         <p>
-          ¿Ya tienes una cuenta? <Link to="/register">Inicia sesión aquí</Link>
+          ¿Ya tienes una cuenta? <Link to="/login">Inicia sesión aquí</Link>
         </p>
       </form>
     </div>
