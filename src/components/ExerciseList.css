@@ -186,3 +186,50 @@ h2 {
   background-color: unset;
   text-decoration: line-through;
 }
+
+.listing-item.disabled {
+  background-color: #f8d7da; /* Fondo rojo claro */
+  color: #721c24; /* Texto rojo oscuro */
+  border: 1px solid #f5c6cb; /* Borde rojo claro */
+  cursor: not-allowed; /* Cursor deshabilitado */
+  pointer-events: none; /* Desactiva clics */
+  position: relative;
+  opacity: 0.7; /* Reduce la opacidad */
+}
+
+.listing-item.disabled::after {
+  content: "Ya generado"; /* Indicador claro */
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 14px;
+  font-weight: bold;
+  color: #721c24; /* Texto rojo oscuro */
+  background-color: #f8d7da; /* Fondo igual al de la tarjeta */
+  padding: 5px 10px;
+  border-radius: 5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.listing-item.disabled:hover {
+  background-color: #f8d7da; /* Mantén el mismo estilo al pasar el cursor */
+  opacity: 0.8; /* Aumenta ligeramente la opacidad */
+}
+
+.listing-item {
+  background-color: #ffffff; /* Fondo blanco */
+  color: #333; /* Texto oscuro */
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  padding: 10px;
+  margin: 5px 0;
+  cursor: pointer;
+  transition: background-color 0.3s, box-shadow 0.3s;
+  position: relative;
+}
+
+.listing-item:hover {
+  background-color: #f0f0f0; /* Cambio sutil en el fondo al pasar el cursor */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}

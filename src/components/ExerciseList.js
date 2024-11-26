@@ -51,7 +51,7 @@ const ExerciseList = () => {
         },
         body: JSON.stringify({ topic: topicId, category, index }),
       });
-  
+
       const response = await fetch(
         `${API_BASE_URL}/api/problems/generate-problem`,
         {
@@ -67,21 +67,20 @@ const ExerciseList = () => {
           }),
         }
       );
-  
+
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(
           errorData.error || "Error al generar un nuevo ejercicio."
         );
       }
-  
+
       const data = await response.json();
       navigate(`/exercise/${data.problem.code}`);
     } catch (error) {
       setError(error.message);
     }
   };
-  
 
   const fetchListings = async () => {
     setLoadingListings(true);
@@ -133,10 +132,17 @@ const ExerciseList = () => {
   return (
     <div className="exercise-list-container">
       <h2>Ejercicios de {topicId}</h2>
+
+      {/* Mostrar estado de carga */}
       {loading && <p className="loading">Cargando datos...</p>}
+
+      {/* Mostrar errores */}
       {error && <p className="error">{error}</p>}
+
+      {/* Contenido principal */}
       {!loading && !error && (
         <>
+          {/* Ejercicios ya creados */}
           {exercises.length > 0 && (
             <div className="exercise-list">
               {exercises.map((exercise) => (
@@ -147,7 +153,15 @@ const ExerciseList = () => {
                 >
                   <h3 className="exercise-title">{exercise.title}</h3>
                   <p className="exercise-description">{exercise.description}</p>
-                  <div className={`exercise-level ${exercise.level}`}>
+                  <div
+                    className={`exercise-level ${
+                      exercise.level === "facil"
+                        ? "basic"
+                        : exercise.level === "medio"
+                        ? "intermediate"
+                        : "advanced"
+                    }`}
+                  >
                     Nivel: {renderLevel(exercise.level)}
                   </div>
                 </div>
@@ -155,21 +169,36 @@ const ExerciseList = () => {
             </div>
           )}
 
+          {/* Listado de preguntas interactivas */}
           {listings && (
             <div className="listings-container">
               {["basico", "intermedio", "avanzado"].map((level) => (
                 <div key={level} className="listing-category">
                   <h3>{level.charAt(0).toUpperCase() + level.slice(1)}</h3>
-                  {listings[level]?.map((exerciseText, index) => (
+                  {listings[level]?.map((exercise, index) => (
                     <div
                       key={index}
-                      onClick={() =>
-                        handleCreateExercise(exerciseText, level, index, level)
-                      }
-                      className="listing-item"
+                      onClick={() => {
+                        if (!exercise.selected) {
+                          handleCreateExercise(
+                            exercise.text,
+                            level,
+                            index,
+                            level
+                          );
+                        }
+                      }}
+                      className={`listing-item ${
+                        exercise.selected ? "disabled" : ""
+                      }`}
                       aria-label={`Ejercicio ${level}`}
+                      title={
+                        exercise.selected
+                          ? "Este enunciado ya fue utilizado para generar un ejercicio."
+                          : "Haz clic para generar un ejercicio."
+                      }
                     >
-                      {exerciseText}
+                      {exercise.text}
                     </div>
                   ))}
                 </div>
@@ -179,6 +208,7 @@ const ExerciseList = () => {
         </>
       )}
 
+      {/* Botones de navegación */}
       <div className="button-group">
         <button onClick={() => navigate("/problems")} className="menu-button">
           Volver al Menú
