@@ -7,9 +7,12 @@ const Register = () => {
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
+  const [loading, setLoading] = useState(false); // Estado para la carga
 
   const handleRegister = async (e) => {
     e.preventDefault();
+
+    setLoading(true); // Activar el estado de carga
 
     try {
       const response = await fetch(`${API_BASE_URL}/api/auth/register`, {
@@ -34,6 +37,8 @@ const Register = () => {
       setErrorMessage(
         "Hubo un problema al intentar registrarte. Por favor, intenta nuevamente."
       );
+    } finally {
+      setLoading(false); // Desactivar el estado de carga
     }
   };
 
@@ -53,11 +58,15 @@ const Register = () => {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
         />
-        <button type="submit">Registrar</button>
-        {errorMessage && <p className="error">{errorMessage}</p>}
-        {successMessage && <p className="success">{successMessage}</p>}
+        <div className="message-container">
+          {errorMessage && <p className="error">{errorMessage}</p>}
+          {successMessage && <p className="success">{successMessage}</p>}
+        </div>
+        <button type="submit" disabled={loading}>
+          {loading ? "Cargando..." : "Registrarse"}
+        </button>
         <p>
-          ¿Ya tienes una cuenta? <Link to="/login">Inicia sesión aquí</Link>
+          ¿Ya tienes una cuenta? <Link to="/login">Iniciar sesión</Link>
         </p>
       </form>
     </div>
